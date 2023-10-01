@@ -1,0 +1,340 @@
+[
+    {
+        "id": "6e17fcc88dd84be5",
+        "type": "tab",
+        "label": "device usage",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f9c23d23.c8c24",
+        "type": "exec",
+        "z": "6e17fcc88dd84be5",
+        "command": "vcgencmd measure_temp",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Raspberry CPU Temperature",
+        "x": 340,
+        "y": 160,
+        "wires": [
+            [
+                "a0ad4644.0efbf8"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "a0ad4644.0efbf8",
+        "type": "function",
+        "z": "6e17fcc88dd84be5",
+        "name": "Extract CPU Temp",
+        "func": "const re = /^temp=(.*)'C$/gm;\n\nmsg.payload = {\n    \"temp\" : Number(msg.payload.replace(re, '$1'))\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 160,
+        "wires": [
+            [
+                "cfd6a8cc373a0178"
+            ]
+        ]
+    },
+    {
+        "id": "a97d78fc.40c268",
+        "type": "inject",
+        "z": "6e17fcc88dd84be5",
+        "name": "scheduller",
+        "props": [
+            {
+                "p": "ts",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 120,
+        "y": 160,
+        "wires": [
+            [
+                "f9c23d23.c8c24",
+                "0eacb2ad30577dbe",
+                "aa85895f10b0dcd0",
+                "dc8375088f29ee39",
+                "ad4e58101cb10a74"
+            ]
+        ]
+    },
+    {
+        "id": "8317134.cff18f",
+        "type": "debug",
+        "z": "6e17fcc88dd84be5",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 990,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "0eacb2ad30577dbe",
+        "type": "exec",
+        "z": "6e17fcc88dd84be5",
+        "command": "vcgencmd get_mem arm",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Raspberry arm memory",
+        "x": 330,
+        "y": 240,
+        "wires": [
+            [
+                "3a22cf9299fdae15"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "3a22cf9299fdae15",
+        "type": "function",
+        "z": "6e17fcc88dd84be5",
+        "name": "Extract arm memory",
+        "func": "const re = /^arm=(.*)M$/gm;\n\nmsg.payload = {\n    \"mem_arm\" : Number(msg.payload.replace(re, '$1'))\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 240,
+        "wires": [
+            [
+                "cfd6a8cc373a0178"
+            ]
+        ]
+    },
+    {
+        "id": "aa85895f10b0dcd0",
+        "type": "exec",
+        "z": "6e17fcc88dd84be5",
+        "command": "vcgencmd get_mem gpu",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Raspberry gpu memory",
+        "x": 330,
+        "y": 320,
+        "wires": [
+            [
+                "0cbc9b3f6adef398"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "0cbc9b3f6adef398",
+        "type": "function",
+        "z": "6e17fcc88dd84be5",
+        "name": "Extract gpu memory",
+        "func": "const re = /^gpu=(.*)M$/gm;\n\nmsg.payload = {\n    \"mem_gpu\" : Number(msg.payload.replace(re, '$1'))\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 320,
+        "wires": [
+            [
+                "cfd6a8cc373a0178"
+            ]
+        ]
+    },
+    {
+        "id": "cfd6a8cc373a0178",
+        "type": "join",
+        "z": "6e17fcc88dd84be5",
+        "name": "",
+        "mode": "custom",
+        "build": "merged",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "6",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 830,
+        "y": 300,
+        "wires": [
+            [
+                "8317134.cff18f",
+                "934d728f889ea7ef",
+                "1f137b264c54db00"
+            ]
+        ]
+    },
+    {
+        "id": "350f94165c499458",
+        "type": "comment",
+        "z": "6e17fcc88dd84be5",
+        "name": "",
+        "info": "node-red-contrib-vcgencmd\nnode-red-contrib-cpu",
+        "x": 80,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "dc8375088f29ee39",
+        "type": "cpu",
+        "z": "6e17fcc88dd84be5",
+        "name": "",
+        "msgCore": true,
+        "msgOverall": false,
+        "msgArray": false,
+        "msgTemp": false,
+        "x": 290,
+        "y": 400,
+        "wires": [
+            [
+                "5d632937d0c9c614"
+            ]
+        ]
+    },
+    {
+        "id": "5d632937d0c9c614",
+        "type": "function",
+        "z": "6e17fcc88dd84be5",
+        "name": "Extract cpu usage",
+        "func": "msg.payload = {\n    \"cpu_usage\" : msg.payload\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 400,
+        "wires": [
+            [
+                "cfd6a8cc373a0178"
+            ]
+        ]
+    },
+    {
+        "id": "ad4e58101cb10a74",
+        "type": "function",
+        "z": "6e17fcc88dd84be5",
+        "name": "human time and timestamp",
+        "func": "function addLeadingZero(num) {\n    if (num < 10) {\n        return \"0\" + num;\n    } else {\n        return num;\n    }\n}\n\nconst d = new Date();\nconst date = new Date(d.getTime() + 25200000);\n\nmsg.payload = {\n    \"ts\" : date.getTime(),\n    \"humanTime\" : `${addLeadingZero(d.getFullYear())}/${addLeadingZero(d.getMonth() + 1)}/${d.getDate()} ${addLeadingZero(d.getHours())}:${addLeadingZero(d.getMinutes())}:${addLeadingZero(d.getSeconds())}`\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 480,
+        "wires": [
+            [
+                "cfd6a8cc373a0178"
+            ]
+        ]
+    },
+    {
+        "id": "934d728f889ea7ef",
+        "type": "http request",
+        "z": "6e17fcc88dd84be5",
+        "name": "post to local",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "body",
+        "url": "http://127.0.0.1:1880/jsonData?node=device",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "Content-Type",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 990,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1362d9574c49105c",
+        "type": "debug",
+        "z": "6e17fcc88dd84be5",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1080,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "1f137b264c54db00",
+        "type": "http request",
+        "z": "6e17fcc88dd84be5",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://157.230.45.66:4000/api/loggerCondition",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 970,
+        "y": 180,
+        "wires": [
+            [
+                "1362d9574c49105c"
+            ]
+        ]
+    }
+]
